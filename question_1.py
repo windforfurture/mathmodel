@@ -1,19 +1,20 @@
-import  numpy as np
+import numpy as np
 import pandas as pd
 from sklearn import metrics
-#read_data
+# read_data
 
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_regression
 
+
 #
 
 class Analysis_of_variance(object):
-    def __init__(self,x,y,k_th=20):
+    def __init__(self, x, y, k_th=20):
         self.x, self.y = x, y
-        selector = SelectKBest(score_func=f_regression, k=k_th)
         print(x)
         print(y)
+        selector = SelectKBest(score_func=f_regression, k=k_th)
         results = selector.fit(x, y)
 
         self.results = results
@@ -29,8 +30,10 @@ class Analysis_of_variance(object):
             "select": results.get_support()
         })
         self.features.sort_values("score", ascending=False)
+
     def return_features(self):
         return self.features
+
     def return_index(self):
         x_new_index = self.results.get_support(indices=True)
         x_new = self.x.iloc[:, x_new_index]
@@ -38,18 +41,11 @@ class Analysis_of_variance(object):
         print(x_new)
 
 
-
-
-
-if __name__=='__main__':
+if __name__ == '__main__':
     Molecular = pd.read_excel('./data/Molecular_Descriptor.xlsx')
     ER = pd.read_excel('./data/ERα_activity.xlsx')
-    data=Molecular.values
-    data=data[:,1:]
-    label = ER.values[:,2]
-    Analysis_of_variance(data,label)
-
-
-
-
-
+    Molecular.head()
+    data = Molecular.iloc[:, 1:]
+    label = ER.iloc[:, 2]
+    function_1 = Analysis_of_variance(data, label)
+    function_1.return_index()
