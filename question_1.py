@@ -113,7 +113,7 @@ def ensemble(rank_result,  is_score=True):
             ensemble_dict[p_result] = p_new_list
 
 
-def write_csv(p_result,p_file_name, is_l=False):
+def write_csv(p_result,p_file_name):
     df = pd.DataFrame(p_result)
     df.to_csv(p_file_name)
 
@@ -148,23 +148,23 @@ if __name__ == '__main__':
     ensemble(av_result)
     write_csv(av_result, path.join(result_dir, av_name))
 
-    # estimator = LinearSVR()
-    # function_1.regression_clear(estimator)
-    # rc_1_result = function_1.get_results()
-    # ensemble(rc_1_result, is_score=False)
-    # write_csv(rc_1_result, path.join(result_dir, rc_1_name))
-    #
-    # estimator = SVR(kernel="linear")
-    # function_1.regression_clear(estimator)
-    # rc_2_result = function_1.get_results()
-    # ensemble(rc_2_result, is_score=False)
-    # write_csv(rc_2_result, path.join(result_dir, rc_2_name))
-    #
-    # estimator = SVR(kernel="rbf")
-    # function_1.regression_clear(estimator)
-    # rc_3_result = function_1.get_results()
-    # ensemble(rc_3_result, is_score=False)
-    # write_csv(rc_3_result, path.join(result_dir, rc_3_name))
+    estimator = LinearSVR()
+    function_1.regression_clear(estimator)
+    rc_1_result = function_1.get_results()
+    ensemble(rc_1_result, is_score=False)
+    write_csv(rc_1_result, path.join(result_dir, rc_1_name))
+
+    estimator = SVR(kernel="linear")
+    function_1.regression_clear(estimator)
+    rc_2_result = function_1.get_results()
+    ensemble(rc_2_result, is_score=False)
+    write_csv(rc_2_result, path.join(result_dir, rc_2_name))
+
+    estimator = SVR(kernel="rbf")
+    function_1.regression_clear(estimator)
+    rc_3_result = function_1.get_results()
+    ensemble(rc_3_result, is_score=False)
+    write_csv(rc_3_result, path.join(result_dir, rc_3_name))
 
     function_1.importance_of_features()
     if_result = function_1.get_results()
