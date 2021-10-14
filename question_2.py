@@ -6,6 +6,8 @@ import  parser
 import codecs
 from  data_uitls import  DatesetReader
 from bucket_iterator import  BucketIterator
+from models import  Ensemble
+
 class Instructor:
     def __init__(self, opt,train_data):
         char_Tokenizer = DatesetReader(train_data)
@@ -26,8 +28,9 @@ class Instructor:
 
         self.dev_data_loader = BucketIterator(data=dev_data, batch_size=opt.batch_size, shuffle=True,
                                                 sort=True)
+        self.model =
         self._print_args()
-        self.global_
+        self.global_mes_error=0.0
 
         if torch.cuda.is_available():
             print('cuda memory allocated:', torch.cuda.memory_allocated(device=0))
