@@ -37,7 +37,6 @@ class SelectFeatures(object):
         features = features.sort_values(by=["score"], ascending=False)
         results = list(features.index)
         self.results = results[:self.k_th]
-        print(self.results)
 
     def regression_clear(self, p_estimator):
         # 创建筛选器
@@ -66,7 +65,6 @@ class SelectFeatures(object):
             if results.support_[i]:
                 results_list.append(i)
         self.results = results_list
-
 
     def importance_of_features(self):
         # 创建分类器
@@ -137,7 +135,6 @@ if __name__ == '__main__':
     av_name = "av.csv"
     rc_1_name = "rc_1.csv"
     rc_2_name = "rc_2.csv"
-    rc_3_name = "rc_3.csv"
     if_name = "if.csv"
 
     # 集成，av与if有排名，rc无排名
@@ -148,23 +145,17 @@ if __name__ == '__main__':
     ensemble(av_result)
     write_csv(av_result, path.join(result_dir, av_name))
 
-    estimator = LinearSVR()
+    estimator = SVR(kernel="linear")
     function_1.regression_clear(estimator)
     rc_1_result = function_1.get_results()
     ensemble(rc_1_result, is_score=False)
     write_csv(rc_1_result, path.join(result_dir, rc_1_name))
 
-    estimator = SVR(kernel="linear")
+    estimator = SVR(kernel="rbf")
     function_1.regression_clear(estimator)
     rc_2_result = function_1.get_results()
     ensemble(rc_2_result, is_score=False)
     write_csv(rc_2_result, path.join(result_dir, rc_2_name))
-
-    estimator = SVR(kernel="rbf")
-    function_1.regression_clear(estimator)
-    rc_3_result = function_1.get_results()
-    ensemble(rc_3_result, is_score=False)
-    write_csv(rc_3_result, path.join(result_dir, rc_3_name))
 
     function_1.importance_of_features()
     if_result = function_1.get_results()
