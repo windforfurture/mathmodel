@@ -30,10 +30,11 @@ class BucketIterator(object):
         batch_char_indices = []
         batch_other_feature = []
         batch_tags= []
-
+        # print(batch_data)
         max_len = max([len(t[self.sort_key]) for t in batch_data])
         for item in batch_data:
-            char_indices,other_feature, tags = item['char_indices'], item['other_feature'],item[tags]
+            # print(item)
+            char_indices,other_feature, tags = item['char_indices'], item['other_feature'],item["tags"]
             text_padding = [0] * (max_len - len(char_indices))
 
             batch_char_indices.append(char_indices + text_padding)

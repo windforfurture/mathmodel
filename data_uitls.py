@@ -51,7 +51,7 @@ class Tokenizer(object):
 
 class DatesetReader:
     def __init__(self,train_data):
-        print(train_data)
+        # print(train_data)
         all_char = []
         for index, row in train_data.iterrows():
             # print(row["SMILES"])
@@ -62,10 +62,10 @@ class DatesetReader:
         self.char_Tokenizer.fit_on_text(all_char)
         self.char_matrix = build_char_matrix(self.char_Tokenizer.word2idx, 50)
 
-    def __read_data__(self,data):
+    def __read_data__(self,text):
         all_data = []
-        print("11111111111111")
-        for index, row in data.iterrows():
+        # print("11111111111111")
+        for index, row in text.iterrows():
             char_list = list(row["SMILES"])
             char_indices = self.char_Tokenizer.text_to_sequence(char_list)
             other_feature = list(row[1:21])
@@ -76,7 +76,8 @@ class DatesetReader:
             "other_feature":other_feature,
             "tags":tags
             }
-        all_data.append(data)
+            all_data.append(data)
+        return all_data
 
 
 
