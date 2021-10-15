@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import  pandas as pd
-
-
+from sklearn.metrics import  mean_squared_error,r2_score
 
 ###########2.回归部分##########
 
@@ -39,41 +38,60 @@ ExtraTreeRegressor = ExtraTreeRegressor()
 
 ###########4.具体方法调用部分##########
 if __name__ == '__main__':
-    Molecular_train = pd.read_excel('./data/Molecular_Descriptor.xlsx')
-    ER_train = pd.read_excel('./data/ERα_activity.xlsx')
-
-    Molecular_test = pd.read_excel('./data/Molecular_Descriptor.xlsx',sheet_name="test")
-    ER_test = pd.read_excel('./data/ERα_activity.xlsx',sheet_name="test")
+    Molecular_train = pd.read_csv('./data/best_column.csv',header=0)
+    Molecular_test = pd.read_csv('./data/test_best_column.csv',header=0)
     train_data_all: pd.DataFrame = Molecular_train.sample(frac=1.0)
+    # train_data_all = Molecular_train
     rows, cols = train_data_all.shape
-    split_index_1 = int(rows * 0.2)
+
+    split_index_1 = int(rows * 0.15)
 
     dev_data_split= train_data_all.iloc[:split_index_1, :]
 
     train_data_split= train_data_all.iloc[split_index_1: rows, :]
-    x_train,y_train = train_data_split.iloc[:, 1:21],train_data_split.iloc[:,-1]
-    x_dev, y_dev = dev_data_split.iloc[:, 1:21], dev_data_split.iloc[:, -1]
-    x_test = ER_test.iloc[:, 1:21]
+    x_train,y_train = train_data_split.iloc[:, 2:22],train_data_split.iloc[:,-1]
+    x_dev, y_dev = dev_data_split.iloc[:, 2:22], dev_data_split.iloc[:, -1]
+
 
     model_list = []
 
 
 
-    model= model_DecisionTreeRegressor
-    model= ExtraTreeRegressor()
-    model= model_LinearRegression
-    # model = model_SVR
+    # model= model_DecisionTreeRegressor
+    # model= ExtraTreeRegressor
+    # model= model_LinearRegression
+    model_1 = model_SVR
     # model = model_KNeighborsRegressor
-    # model = model_RandomForestRegressor
+    model_2 = model_RandomForestRegressor
     # model = model_AdaBoostRegressor
-    # model = model_GradientBoostingRegressor
-    # model = BaggingRegressor
+    model_3 = model_GradientBoostingRegressor
+    model_4 = model_BaggingRegressor
 
-    # model = ExtraTreeRegressor
-    model.fit(x_train,y_train)
-    score = model.score(x_dev, y_dev)
-    result = model.predict(x_dev)
-    result_test = model.predict(x_dev)
+    #
+    model_1.fit(x_train,y_train)
+    result_1 = model_1.predict(x_dev)
+
+    model_2.fit(x_train, y_train)
+    result_2 = model_2.predict(x_dev)
+
+    model_3.fit(x_train, y_train)
+    result_3 = model_3.predict(x_dev)
+
+    model_4.fit(x_train, y_train)
+    result_4 = model_4.predict(x_dev)
+    result = (result_1+result_2+result_3+result_4)/4
+
+    result_4 = model_4.predict(x_dev)
+    result = (result_1+result_2+result_3+result_4)/4
+    # model.fit(x_train, y_train)
+    # result= model.predict(x_dev)
+
+    print(mean_squared_error(y_dev,result))
+
+    score = r2_score(y_dev,result)
+    print(score)
+
+
     # save_path = "./result_2/question_2_traditional.text"
     # file_out = codecs.open(save_path, 'a+')
     # file_out.write(model.__class__.__name__)
@@ -82,10 +100,11 @@ if __name__ == '__main__':
     # file_out.write("\r")
     # file_out.write(result_test)
     # file_out.close()
-    print(result)
+    # print(result)
     plt.figure()
     plt.plot(np.arange(len(result)), y_dev,'go-',label='true value')
     plt.plot(np.arange(len(result)),result,'ro-',label='predict value')
     plt.title('score: %f'%score)
     plt.legend()
     plt.show()
+    # plt.savefig("./figure/")
