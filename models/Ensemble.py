@@ -11,12 +11,12 @@ class Single_Linear(nn.Module):
         y = self.linear(x)
         return y
 
-class Multi_linear(nn.Module):
+class Multi_Linear(nn.Module):
     def __init__(self):
-        super(Multi_linear, self).__init__()
-        self.linear = torch.nn.Linear(20, 50)
+        super(Multi_Linear, self).__init__()
+        self.linear = torch.nn.Linear(20, 10)
         self.tanh = torch.nn.Tanh()
-        self.linear_2 = torch.nn.Linear(50, 1)
+        self.linear_2 = torch.nn.Linear(10, 1)
 
     def forward(self, x):
         y = self.linear(x)
@@ -31,7 +31,7 @@ class Ensemble_model(nn.Module):
     def __init__(self):
         super(Ensemble_model, self).__init__()
         self.function_1 =  Single_Linear()
-        self.function_2 = Multi_linear()
+        self.function_2 = Multi_Linear()
         self.concat_linear = torch.nn.Linear(2,1)
 
     def forward(self, input):

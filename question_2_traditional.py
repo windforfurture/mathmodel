@@ -10,6 +10,7 @@ import  pandas as pd
 ###########3.具体方法选择##########
 ####3.1决策树回归####
 from sklearn import tree
+import  codecs
 model_DecisionTreeRegressor = tree.DecisionTreeRegressor()
 ####3.2线性回归####
 from sklearn import linear_model
@@ -54,10 +55,13 @@ if __name__ == '__main__':
     x_dev, y_dev = dev_data_split.iloc[:, 1:21], dev_data_split.iloc[:, -1]
     x_test = ER_test.iloc[:, 1:21]
 
+    model_list = []
 
-    # model = model_DecisionTreeRegressor
-    # model = ExtraTreeRegressor()
-    # model = model_LinearRegression
+
+
+    model= model_DecisionTreeRegressor
+    model= ExtraTreeRegressor()
+    model= model_LinearRegression
     # model = model_SVR
     # model = model_KNeighborsRegressor
     # model = model_RandomForestRegressor
@@ -65,12 +69,19 @@ if __name__ == '__main__':
     # model = model_GradientBoostingRegressor
     # model = BaggingRegressor
 
-    model = ExtraTreeRegressor
+    # model = ExtraTreeRegressor
     model.fit(x_train,y_train)
     score = model.score(x_dev, y_dev)
     result = model.predict(x_dev)
     result_test = model.predict(x_dev)
-
+    # save_path = "./result_2/question_2_traditional.text"
+    # file_out = codecs.open(save_path, 'a+')
+    # file_out.write(model.__class__.__name__)
+    # file_out.write("\r")
+    # file_out.write("determination R^2 of the Dev is {0}".format(score))
+    # file_out.write("\r")
+    # file_out.write(result_test)
+    # file_out.close()
     print(result)
     plt.figure()
     plt.plot(np.arange(len(result)), y_dev,'go-',label='true value')
