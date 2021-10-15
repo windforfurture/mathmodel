@@ -118,12 +118,12 @@ def write_csv(p_result,p_file_name):
 
 if __name__ == '__main__':
     Molecular = pd.read_excel('./data/Molecular_Descriptor.xlsx')
-    ER = pd.read_excel('./data/ERα_activity.xlsx')
+    # ER = pd.read_excel('./data/ERα_activity.xlsx')
     Molecular.head()
-    data = Molecular.iloc[:, 1:]
+    data = Molecular.iloc[:, 1:-1]
     # 归一化处理
     my_head = data.columns.values.tolist()
-    label = ER.iloc[:, 2]
+    label = Molecular.iloc[:,-1]
     data = pd.DataFrame(StandardScaler().fit_transform(data))
     data.columns = my_head
     # 前30
@@ -171,7 +171,3 @@ if __name__ == '__main__':
     final_result = get_name_idx(final_result,my_head)
     final_name = "final.csv"
     write_csv(final_result, path.join(result_dir, final_name))
-
-
-
-
