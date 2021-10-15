@@ -8,7 +8,7 @@ import  parser
 import codecs
 from  data_uitls import  DatesetReader
 from bucket_iterator import  BucketIterator
-from models.Ensemble import  Ensemble_model,Singal_Liner,Multi_liner
+from models.Ensemble import  Ensemble_model,Single_Linear,Multi_linear
 from sklearn.preprocessing import StandardScaler
 
 class Instructor:
@@ -37,6 +37,10 @@ class Instructor:
         self.criterion = nn.MSELoss()
         if  self.opt.model_name ==  "Ensemble_model":
             self.model = Ensemble_model().to(device=opt.device)
+        if self.opt.model_name =="Singal_Linear":
+            self.model = Single_Linear().to(device=opt.device)
+        if self.opt.model_name =="Multi_linear":
+            self.model = Multi_Linear().to(device=opt.device)
 
         self._print_args()
         print("1111111111")
@@ -97,7 +101,7 @@ class Instructor:
             dev_total_loss = self._eval()
             if best_min_loss<dev_total_loss:
                 torch.save(self.model,
-                          'state_dict/' + str(
+                          'state_dict/' + str(opt.model_name)+ str(
                               best_min_loss) + '.pkl')
 
 
