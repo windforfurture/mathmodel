@@ -68,7 +68,7 @@ class DatesetReader:
         for index, row in text.iterrows():
             char_list = list(row["SMILES"])
             char_indices = self.char_Tokenizer.text_to_sequence(char_list)
-            other_feature = list(row[1:21])
+            other_feature = list(row[2:22])
 
             tags = row[-1]
             data = {

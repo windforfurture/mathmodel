@@ -17,7 +17,7 @@ class Instructor:
         self.opt = opt
         char_Tokenizer = DatesetReader(train_data)
 
-        train_data: pd.DataFrame = train_data.sample(frac=1.0)
+        # train_data: pd.DataFrame = train_data.sample(frac=1.0)
         rows, cols = train_data.shape
         split_index_1 = int(rows * 0.2)
 
@@ -44,7 +44,7 @@ class Instructor:
         self.criterion = nn.MSELoss()
         if  self.opt.model_name ==  "Ensemble_model":
             self.model = Ensemble_model().to(device=opt.device)
-        if self.opt.model_name =="Singal_Linear":
+        if self.opt.model_name =="Single_Linear":
             self.model = Single_Linear().to(device=opt.device)
         if self.opt.model_name =="Multi_linear":
             self.model = Multi_Linear().to(device=opt.device)
@@ -90,6 +90,8 @@ class Instructor:
         print('\r >>> this epoch dev loss is {:.4f}'.format(dev_total_loss/(dev_i_batch*len(dev_sample_batched))))
         print('\r >>> this epoch dev coefficient of determination is {0}'.format(
             r2_score(dev_targets_list, dev_pred_list)))
+        print(dev_targets_list)
+        print(dev_pred_list)
 
         return  r2_score(dev_targets_list, dev_pred_list)
     def _test(self):
@@ -113,9 +115,10 @@ class Instructor:
 
         self.model.train()
         _params = filter(lambda p: p.requires_grad, self.model.parameters())
-        optimizer = torch.optim.Adam(_params, lr=0.00005)
+        optimizer = torch.optim.Adam(_params, lr=0.001)
 
         best_dev_total_r2_score = 0.0
+        best_train_total_r2_score=0.0
         for epoch in range(self.opt.num_epoch):
             train_total_loss = 0.0
             self.model.train()
@@ -139,13 +142,16 @@ class Instructor:
 
             print('\r >>> this epoch {0} train loss is {1}'.format(epoch,train_total_loss/(train_i_batch*len(sample_batched))))
             print('\r >>> this epoch coefficient of determination is {0}'.format(r2_score(targets_list, pred_list)))
-
+            train_total_r2_score = r2_score(targets_list, pred_list)
             dev_total_r2_score= self._eval()
+            if train_total_r2_score>best_train_total_r2_score:
+                train_total_r2_score = best_train_total_r2_score
             if dev_total_r2_score>best_dev_total_r2_score:
                 best_dev_total_r2_score =  dev_total_r2_score
-                torch.save(self.model,
-                          'state_dict/' + str(opt.model_name)+ str(
-                              dev_total_r2_score) + '.pkl')
+            print(best_dev_total_r2_score)
+            #     torch.save(self.model,
+            #               'state_dict/' + str(opt.model_name)+ str(
+            #                   dev_total_r2_score) + '.pkl')
 
 
 
@@ -169,17 +175,15 @@ if __name__ == '__main__':
     parser.add_argument('--Pattern', default="train", type=str) #"train","eval","test"
     parser.add_argument('--batch_size', default=32, type=int)
     parser.add_argument('--device', default="cuda:0", type=str)
-    parser.add_argument('--num_epoch',default=100,type=int)
+    parser.add_argument('--num_epoch',default=200,type=int)
     parser.add_argument('--model_name', default="Ensemble_model", type=str)
     opt = parser.parse_args()
 
     opt.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') \
         if opt.device is None else torch.device(opt.device)
 
-    Molecular_train = pd.read_excel('./data/Molecular_Descriptor.xlsx')
-    ER_train = pd.read_excel('./data/ERα_activity.xlsx')
-
-    Molecular_test = pd.read_excel('./data/Molecular_Descriptor.xlsx',sheet_name="test")
+    Molecular_train = pd.read_csv('./data/best_column.csv', header=0)
+    Molecular_test = pd.read_csv('./data/test_best_column.csv', header=0)
 
     Molecular_train.head()
     Molecular_test.head()
