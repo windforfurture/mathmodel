@@ -28,6 +28,10 @@ class SelectFeatures(object):
         # results.scores_: 每个特征的分数
         # results.pvalues_: 每个特征的p-value
         # results.get_support(): 返回一个布尔向量，True表示选择该特征，False表示放弃，也可以返回索引
+        print(results.pvalues_)
+        print(len(results.pvalues_))
+        exit()
+
         features = pd.DataFrame({
             "feature": self.X.columns,
             "score": results.scores_,
@@ -142,6 +146,8 @@ if __name__ == '__main__':
 
     function_1.analysis_of_variance()
     av_result = function_1.get_results()
+
+
     ensemble(av_result)
     write_csv(av_result, path.join(result_dir, av_name))
 

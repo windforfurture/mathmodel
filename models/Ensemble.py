@@ -6,8 +6,10 @@ import torch.nn.functional as F
 class Single_Linear(nn.Module):
     def __init__(self):
         super(Single_Linear, self).__init__()
-        self.linear = torch.nn.Linear(20,1)
+        self.linear = torch.nn.Linear(20,1,bias=True)
     def forward(self,x):
+        if isinstance(x,list):
+            [x] = x
         y = self.linear(x)
         return y
 
@@ -19,6 +21,8 @@ class Multi_Linear(nn.Module):
         self.linear_2 = torch.nn.Linear(10, 1)
 
     def forward(self, x):
+        if isinstance(x,list):
+            [x] = x
         y = self.linear(x)
         y = self.tanh(y)
         y = self.linear_2(y)
