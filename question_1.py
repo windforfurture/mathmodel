@@ -5,7 +5,7 @@ import pandas as pd
 import csv
 from sklearn.ensemble import RandomForestRegressor
 
-from sklearn.feature_selection import SelectKBest, RFE
+from sklearn.feature_selection import SelectKBest, RFE, mutual_info_regression
 from sklearn.feature_selection import f_regression
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression
@@ -21,8 +21,8 @@ class SelectFeatures(object):
         self.features = None
         self.results = None
 
-    def analysis_of_variance(self):
-        selector = SelectKBest(score_func=f_regression, k=self.k_th)
+    def analysis_of_variance(self,p_func):
+        selector = SelectKBest(score_func=p_func, k=self.k_th)
         results = selector.fit(self.X, self.y)
         self.results = results
 
@@ -134,7 +134,8 @@ if __name__ == '__main__':
 
     # 文件设置
     result_dir = "result_1"
-    av_name = "av.csv"
+    av_1_name = "av_1.csv"
+    av_2_name = "av_2.csv"
     rc_1_name = "rc_1.csv"
     rc_2_name = "rc_2.csv"
     if_name = "if.csv"
@@ -143,10 +144,17 @@ if __name__ == '__main__':
     # 集成，av与if有排名，rc无排名
     ensemble_dict = dict()
 
-    function_1.analysis_of_variance()
-    av_result = function_1.get_results()
-    ensemble(av_result)
-    write_csv(av_result, path.join(result_dir, av_name))
+    score_func = f_regression
+    function_1.analysis_of_variance(score_func)
+    av_1_result = function_1.get_results()
+    ensemble(av_1_result)
+    write_csv(av_1_result, path.join(result_dir, av_1_name))
+
+    score_func = mutual_info_regression
+    function_1.analysis_of_variance(score_func)
+    av_2_result = function_1.get_results()
+    ensemble(av_2_result)
+    write_csv(av_2_result, path.join(result_dir, av_2_name))
 
     estimator = LinearSVR()
     function_1.recursion_clear(estimator)
