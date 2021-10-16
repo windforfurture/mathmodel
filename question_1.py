@@ -12,6 +12,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR, LinearSVR
 
+import data_uitls
+
 
 class SelectFeatures(object):
     def __init__(self, X, y, k_th=30):
@@ -28,10 +30,6 @@ class SelectFeatures(object):
         # results.scores_: 每个特征的分数
         # results.pvalues_: 每个特征的p-value
         # results.get_support(): 返回一个布尔向量，True表示选择该特征，False表示放弃，也可以返回索引
-        print(results.pvalues_)
-        print(len(results.pvalues_))
-        exit()
-
         features = pd.DataFrame({
             "feature": self.X.columns,
             "score": results.scores_,
@@ -42,11 +40,11 @@ class SelectFeatures(object):
         results = list(features.index)
         self.results = results[:self.k_th]
 
-    def regression_clear(self, p_estimator):
+    def recursion_clear(self, p_estimator):
         # 创建筛选器
         selector = RFE(
             # estimator=LinearRegression()
-            estimator=LinearSVR(),  # 由于这是分类问题，选择简单的逻辑回归
+            estimator=p_estimator,  # 由于这是分类问题，选择简单的逻辑回归
             n_features_to_select=self.k_th,  # 选择的最小特征数量
             # cv=5,  # 交叉验证折数
             # scoring="accuracy",  # 评估预测精度的指标
@@ -60,9 +58,9 @@ class SelectFeatures(object):
         # results.n_features_: 最终选择的特征数量
         # results.support_: 布尔向量，True表示保留特征，False表示剔除特征
         # results.ranking_: 特征等级，1表示最高优先级，即应该保留的特征
-        print("Number of selected features = %d" % results.n_features_)
-        print("Selected features: %s" % results.support_)
-        print("Feature ranking: %s" % results.ranking_)
+        # print("Number of selected features = %d" % results.n_features_)
+        # print("Selected features: %s" % results.support_)
+        # print("Feature ranking: %s" % results.ranking_)
         nr = len(results.support_)
         results_list = []
         for i in range(nr):
@@ -140,25 +138,24 @@ if __name__ == '__main__':
     rc_1_name = "rc_1.csv"
     rc_2_name = "rc_2.csv"
     if_name = "if.csv"
+    final_name = "final.csv"
 
     # 集成，av与if有排名，rc无排名
     ensemble_dict = dict()
 
     function_1.analysis_of_variance()
     av_result = function_1.get_results()
-
-
     ensemble(av_result)
     write_csv(av_result, path.join(result_dir, av_name))
 
-    estimator = SVR(kernel="linear")
-    function_1.regression_clear(estimator)
+    estimator = LinearSVR()
+    function_1.recursion_clear(estimator)
     rc_1_result = function_1.get_results()
     ensemble(rc_1_result, is_score=False)
     write_csv(rc_1_result, path.join(result_dir, rc_1_name))
 
-    estimator = SVR(kernel="rbf")
-    function_1.regression_clear(estimator)
+    estimator = LinearRegression()
+    function_1.recursion_clear(estimator)
     rc_2_result = function_1.get_results()
     ensemble(rc_2_result, is_score=False)
     write_csv(rc_2_result, path.join(result_dir, rc_2_name))
@@ -175,5 +172,12 @@ if __name__ == '__main__':
 
     final_result.sort(key=lambda x: [-x[1], x[2]])
     final_result = get_name_idx(final_result,my_head)
-    final_name = "final.csv"
+
     write_csv(final_result, path.join(result_dir, final_name))
+
+    best_column_file = path.join(result_dir, final_name)
+    column_file = 'data/Molecular_Descriptor.xlsx'
+    process_file = 'result_1/best_column.csv'
+    process_test_file = 'result_1/test_best_column.csv'
+    data_uitls.make_best_columns_file(best_column_file,column_file,process_file)
+    data_uitls.make_best_columns_file(best_column_file, column_file, process_test_file,is_test=True)

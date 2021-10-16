@@ -1,7 +1,7 @@
 import  os
 import  pickle
 import numpy as np
-import pandas
+import pandas as pd
 
 
 def build_char_matrix(char2idx, char_dim):
@@ -80,6 +80,21 @@ class DatesetReader:
         return all_data
 
 
+def make_best_columns_file(p_best_result_file, p_column_file, p_process_file, num=20, is_test=False):
+    df_0 = pd.read_csv(p_best_result_file)
+    best_columns = df_0["1"].values
+
+    if is_test:
+        df_1 = pd.read_excel(p_column_file, sheet_name="test")
+    else:
+        df_1 = pd.read_excel(p_column_file)
+    df_new = pd.DataFrame({"SMILES": df_1["SMILES"]})
+    for i in range(num):
+        df_new.insert(df_new.shape[1], best_columns[i], df_1[best_columns[i]])
+        df_new[best_columns[i]] = df_new[[best_columns[i]]].apply(lambda x: (x - x.mean()) / x.std())
+    if not is_test:
+        df_new.insert(df_new.shape[1], df_1.columns[-1], df_1.values[:, -1])
+    df_new.to_csv(p_process_file)
 
 
 
