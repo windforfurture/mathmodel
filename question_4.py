@@ -128,13 +128,13 @@ min_l = []
 good_label = [1, 1, 0, 1, 0]
 n_f = len(insect_l)
 
-
 for i_data in data_all.values:
     good_sum = 0
     for i in range(5):
         if good_label[i] == i_data[-5+i]:
             good_sum += 1
     if good_sum >= 3:
+
         if len(max_l) == 0:
 
             max_l += list(i_data[:-6])
@@ -168,22 +168,24 @@ c_best_model_list = []
 for i in range(5):
     c_best_model_list.append(joblib.load(c_best_model_file_list[i]))
 r_best_model = joblib.load(r_best_model_file)
-for i_1 in range(sep_num):
+
+for i_1 in range(n_f):
     for i_2 in range(sep_num):
         for i_3 in range(sep_num):
             for i_4 in range(sep_num):
-                x_test = [all_data[0][i_1],all_data[1][i_2],all_data[2][i_3],all_data[3][i_4]]
-                c_y_test_sum = 0
-                for i in range(5):
-                    c_best_model = c_best_model_list[i]
-                    c_y_test_predict = c_best_model.predict([x_test])[0]
-                    if c_y_test_predict == good_label[i]:
-                        c_y_test_sum += 1
-                if c_y_test_sum >= 3:
-                    yz = r_best_model.predict([x_test])[0]
-                    if yz > max_yz:
-                        max_yz = yz
-                        best_test = x_test
+                for i_5 in range(sep_num):
+                    x_test = [all_data[0][i_1],all_data[1][i_2],all_data[2][i_3],all_data[3][i_4],all_data[3][i_5]]
+                    c_y_test_sum = 0
+                    for i in range(5):
+                        c_best_model = c_best_model_list[i]
+                        c_y_test_predict = c_best_model.predict([x_test])[0]
+                        if c_y_test_predict == good_label[i]:
+                            c_y_test_sum += 1
+                    if c_y_test_sum >= 3:
+                        yz = r_best_model.predict([x_test])[0]
+                        if yz > max_yz:
+                            max_yz = yz
+                            best_test = x_test
 
 # 反归一化
 best_original = []

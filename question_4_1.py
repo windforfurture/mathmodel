@@ -5,7 +5,7 @@ import pandas as pd
 import csv
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 
-from sklearn.feature_selection import SelectKBest, RFE
+from sklearn.feature_selection import SelectKBest, RFE, mutual_info_classif
 from sklearn.feature_selection import f_classif
 from sklearn.decomposition import PCA
 from sklearn.linear_model import LinearRegression, LogisticRegression
@@ -19,8 +19,8 @@ class SelectFeatures(object):
         self.features = None
         self.results = None
 
-    def analysis_of_variance(self):
-        selector = SelectKBest(score_func=f_classif, k=self.k_th)
+    def analysis_of_variance(self,p_func):
+        selector = SelectKBest(score_func=p_func, k=self.k_th)
         results = selector.fit(self.X, self.y)
         self.results = results
 
@@ -93,6 +93,23 @@ def get_name_idx(result_list, head_list):
     return ret
 
 
+def ensemble(rank_result,  is_score=True):
+    no_score_rank = top_k_nums // 2
+    for p_idx, p_result in enumerate(rank_result):
+        if ensemble_dict.get(p_result) is not None:
+            ensemble_dict[p_result][0] += 1
+            if is_score:
+                ensemble_dict[p_result][1] += p_idx
+            else:
+                ensemble_dict[p_result][1] += no_score_rank
+        else:
+            p_new_list = [1]
+            if is_score:
+                p_new_list.append(p_idx)
+            else:
+                p_new_list.append(no_score_rank)
+            ensemble_dict[p_result] = p_new_list
+
 
 def write_csv(p_result,p_file_name):
     df = pd.DataFrame(p_result)
@@ -136,20 +153,28 @@ if __name__ == '__main__':
     """
         集成分类结果，>=3为1，否则为0
     """
-    av_name = "av_ensemble.csv"
+    av_1_name = "av_1_ensemble.csv"
+    av_2_name = "av_2_ensemble.csv"
     rc_1_name = "rc_1_ensemble.csv"
     rc_2_name = "rc_2_ensemble.csv"
     if_name = "if_ensemble.csv"
     final_name = "final_ensemble.csv"
     insect_name = "insect_ensemble.csv"
     # function_1 = SelectFeatures(data, ensemble_label, k_th=top_k_nums)
-    # # 集成，av与if有排名，rc无排名
+    # 集成，av与if有排名，rc无排名
     # ensemble_dict = dict()
     #
-    # function_1.analysis_of_variance()
-    # av_result = function_1.get_results()
-    # ensemble(av_result)
-    # write_csv(av_result, path.join(result_dir, av_name))
+    # score_func = f_classif
+    # function_1.analysis_of_variance(score_func)
+    # av_1_result = function_1.get_results()
+    # ensemble(av_1_result)
+    # write_csv(av_1_result, path.join(result_dir, av_1_name))
+    #
+    # score_func = mutual_info_classif
+    # function_1.analysis_of_variance(score_func)
+    # av_2_result = function_1.get_results()
+    # ensemble(av_2_result)
+    # write_csv(av_2_result, path.join(result_dir, av_2_name))
     #
     # estimator = SVC(kernel="linear")
     # function_1.recursion_clear(estimator)
@@ -182,9 +207,8 @@ if __name__ == '__main__':
     rdf = pd.read_csv(regression_final_result_name)
 
     cdf_l = cdf.iloc[:20,1]
-    rdf_s = set(rdf.iloc[:,1])
-    print(cdf_l)
-    print(rdf_s)
+    rdf_s = set(rdf.iloc[:85,1])
+
     insect_l = []
     for i_cdf in cdf_l:
         if i_cdf in rdf_s:
